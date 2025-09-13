@@ -12,11 +12,6 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Todos los campos son obligatorios" });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: "El email ya está registrado" });
-    }
-
     const passwordHash = await bcrypt.hash(password, 10);
 
     const newUser = new User({
@@ -40,6 +35,12 @@ router.post("/", async (req, res) => {
     });
   } catch (err) {
     console.error("Error registrando usuario:", err);
+
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0];
+      return res.status(400).json({ error: `El ${field} ya está registrado` });
+    }
+
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
