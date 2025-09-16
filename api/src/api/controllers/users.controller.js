@@ -1,6 +1,8 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import User from "../../lib/models/user.model.js";
+import { authMiddleware } from "../middlewares/auth.js";
+import Job from "../../lib/models/job.model.js";
 
 const router = Router();
 
@@ -47,6 +49,47 @@ router.post("/", async (req, res) => {
 
 router.get("/", (req, res) => {
   res.json({ message: "ok users" });
+});
+// Obtener el perfil del usuario logueado
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-passwordHash");
+    if (!user) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error("Error obteniendo perfil:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+router.get("/me/history", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role === "worker") {
+      const jobs = await Job.find({
+        status: "completed",
+        applicants: req.user.id
+      })
+        .select("title date durationHours employer completedAt")
+        .populate("employer", "name email");
+      return res.json({ role: "worker", history: jobs });
+    }
+
+    if (req.user.role === "employer") {
+      const jobs = await Job.find({
+        status: "completed",
+        employer: req.user.id
+      })
+        .select("title date durationHours applicants completedAt")
+        .populate("applicants", "name email");
+      return res.json({ role: "employer", history: jobs });
+    }
+
+    res.status(400).json({ error: "Rol no soportado para historial" });
+  } catch (err) {
+    console.error("Error obteniendo historial:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
 });
 
 export default router;

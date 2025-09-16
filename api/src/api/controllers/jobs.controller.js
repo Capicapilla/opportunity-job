@@ -6,7 +6,7 @@ import { sendEmail } from "../../lib/email.js";
 
 const router = Router();
 
-// Crear un nuevo trabajo
+// Crear nuevo trabajo
 router.post("/", authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== "employer") {
@@ -37,7 +37,7 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-// Listar todos los trabajos
+// Mostrar todos los trabajos
 router.get("/", async (req, res) => {
   try {
     const jobs = await Job.find().populate("employer", "name email role");
@@ -91,6 +91,85 @@ router.post("/:id/apply", authMiddleware, async (req, res) => {
     res.json({ message: "Postulación exitosa", job });
   } catch (err) {
     console.error("Error en postulación:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+// Ver candidatos de una oferta de trabajo
+router.get("/:id/applicants", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "employer") {
+      return res.status(403).json({ error: "Solo los empleadores pueden ver candidatos" });
+    }
+
+    const job = await Job.findById(req.params.id)
+      .populate("applicants", "name email age socialSecurityNumber");
+
+    if (!job) {
+      return res.status(404).json({ error: "Trabajo no encontrado" });
+    }
+
+    if (job.employer.toString() !== req.user.id) {
+      return res.status(403).json({ error: "No tienes permiso para ver los candidatos de este trabajo" });
+    }
+
+    res.json({ applicants: job.applicants });
+  } catch (err) {
+    console.error("Error obteniendo candidatos:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+// Eliminar trabajo
+router.delete("/:id", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "employer") {
+      return res.status(403).json({ error: "Solo los empleadores pueden eliminar trabajos" });
+    }
+
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ error: "Trabajo no encontrado" });
+    }
+
+    if (job.employer.toString() !== req.user.id) {
+      return res.status(403).json({ error: "No puedes eliminar trabajos que no son tuyos" });
+    }
+
+    await job.deleteOne();
+
+    res.json({ message: "Trabajo eliminado correctamente" });
+  } catch (err) {
+    console.error("Error eliminando trabajo:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+router.patch("/:id/complete", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "employer") {
+      return res.status(403).json({ error: "Solo los empleadores pueden completar trabajos" });
+    }
+
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ error: "Trabajo no encontrado" });
+
+    if (job.employer.toString() !== req.user.id) {
+      return res.status(403).json({ error: "No puedes completar trabajos que no son tuyos" });
+    }
+
+    if (job.status === "completed") {
+      return res.status(400).json({ error: "El trabajo ya estaba completado" });
+    }
+
+    job.status = "completed";
+    job.completedAt = new Date();
+    await job.save();
+
+    res.json({ message: "Trabajo marcado como completado", job });
+  } catch (err) {
+    console.error("Error completando trabajo:", err);
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
