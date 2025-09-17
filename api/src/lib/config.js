@@ -8,6 +8,8 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || "capicapilla123",
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   jwtCookieExpiresIn: process.env.JWT_COOKIE_EXPIRES_IN || 7,
+  sessionSecret: process.env.SESSION_SECRET || "super-secret-session",
+  frontOrigin: process.env.FRONT_ORIGIN || "http://localhost:5173",
   emailHost: process.env.EMAIL_HOST,
   emailPort: process.env.EMAIL_PORT || 465,
   emailUser: process.env.EMAIL_USER,

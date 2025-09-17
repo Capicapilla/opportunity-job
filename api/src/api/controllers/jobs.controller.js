@@ -19,6 +19,21 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
+    // Validación: fecha al menos 2 horas en el futuro
+    const jobDate = new Date(date);
+    const nowPlus2h = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    if (isNaN(jobDate.getTime()) || jobDate < nowPlus2h) {
+      return res.status(400).json({ error: "La fecha debe tener al menos 2 horas de antelación" });
+    }
+
+    // Validación: límites razonables
+    if (durationHours < 1 || durationHours > 12) {
+      return res.status(400).json({ error: "La duración debe estar entre 1 y 12 horas" });
+    }
+    if (maxApplicants && (maxApplicants < 1 || maxApplicants > 10)) {
+      return res.status(400).json({ error: "El máximo de postulantes debe estar entre 1 y 10" });
+    }
+
     const newJob = new Job({
       title,
       descriptionMarkdown,
@@ -36,6 +51,7 @@ router.post("/", authMiddleware, async (req, res) => {
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
+
 
 // Mostrar todos los trabajos
 router.get("/", async (req, res) => {

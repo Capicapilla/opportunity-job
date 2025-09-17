@@ -63,6 +63,27 @@ router.get("/me", authMiddleware, async (req, res) => {
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
+
+// Mis postulaciones (trabajador)
+router.get("/me/applications", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "worker") {
+      return res.status(403).json({ error: "Solo los trabajadores pueden ver sus postulaciones" });
+    }
+
+    const jobs = await Job.find({
+      applicants: req.user.id,
+    })
+      .select("title date durationHours employer status createdAt")
+      .populate("employer", "name email")
+      .sort({ date: 1 });
+
+    res.json({ applications: jobs });
+  } catch (err) {
+    console.error("Error obteniendo postulaciones:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
 router.get("/me/history", authMiddleware, async (req, res) => {
   try {
     if (req.user.role === "worker") {

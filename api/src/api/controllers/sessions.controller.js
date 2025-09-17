@@ -1,8 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import User from "../../lib/models/user.model.js";
-import { config } from "../../lib/config.js";
 
 const router = Router();
 
@@ -24,14 +22,9 @@ router.post("/", async (req, res) => {
       return res.status(401).json({ error: "Credenciales inválidas" });
     }
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      config.jwtSecret,
-      { expiresIn: "1d" }
-    );
+    req.session.user = { id: user._id.toString(), role: user.role };
 
     res.json({
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -41,6 +34,18 @@ router.post("/", async (req, res) => {
     });
   } catch (err) {
     console.error("Error en login:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+router.post("/logout", (req, res) => {
+  try {
+    req.session.destroy(() => {
+      res.clearCookie("sid");
+      res.json({ ok: true });
+    });
+  } catch (err) {
+    console.error("Error en logout:", err);
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
