@@ -38,6 +38,34 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    education: {
+      type: String,
+      trim: true,
+    },
+    experience: {
+      type: String,
+      trim: true,
+    },
+    skills: [{
+      type: String,
+      trim: true,
+    }],
+    phone: {
+      type: String,
+      trim: true,
+    },
+    address: {
+      type: String,
+      trim: true,
+    },
+    companyName: {
+      type: String,
+      trim: true,
+    },
+    companyDescription: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,

@@ -8,23 +8,45 @@ const router = Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { name, age, socialSecurityNumber, email, password, role } = req.body;
+    const { name, lastName, age, socialSecurityNumber, email, password, role, companyName, companyDescription } = req.body;
 
-    if (!name || !age || !socialSecurityNumber || !email || !password) {
-      return res.status(400).json({ error: "Todos los campos son obligatorios" });
+    // Validaciones básicas
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "Nombre, email y contraseña son obligatorios" });
+    }
+
+    // Validaciones específicas por rol
+    if (role === 'worker') {
+      if (!age || !socialSecurityNumber) {
+        return res.status(400).json({ error: "Para trabajadores, edad y número de seguridad social son obligatorios" });
+      }
+    } else if (role === 'employer') {
+      if (!companyName) {
+        return res.status(400).json({ error: "Para empresas, el nombre de la empresa es obligatorio" });
+      }
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const newUser = new User({
-      name,
-      age,
-      socialSecurityNumber,
+    // Crear objeto de usuario con campos específicos según el rol
+    const userData = {
+      name: lastName ? `${name} ${lastName}` : name, // Combinar nombre y apellidos
       email,
       passwordHash,
       role,
-    });
+    };
 
+    // Agregar campos específicos según el rol
+    if (role === 'worker') {
+      userData.age = age;
+      userData.socialSecurityNumber = socialSecurityNumber;
+    } else if (role === 'employer') {
+      userData.age = age || 30; // Edad por defecto para empresas
+      userData.companyName = companyName;
+      userData.companyDescription = companyDescription;
+    }
+
+    const newUser = new User(userData);
     await newUser.save();
 
     res.status(201).json({
@@ -34,6 +56,8 @@ router.post("/", async (req, res) => {
       role: newUser.role,
       age: newUser.age,
       socialSecurityNumber: newUser.socialSecurityNumber,
+      companyName: newUser.companyName,
+      companyDescription: newUser.companyDescription,
     });
   } catch (err) {
     console.error("Error registrando usuario:", err);
@@ -60,6 +84,54 @@ router.get("/me", authMiddleware, async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error("Error obteniendo perfil:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+// Actualizar perfil del usuario logueado
+router.put("/me", authMiddleware, async (req, res) => {
+  try {
+    const { education, experience, skills, phone, address } = req.body;
+    
+    const updateData = {};
+    if (education !== undefined) updateData.education = education;
+    if (experience !== undefined) updateData.experience = experience;
+    if (skills !== undefined) updateData.skills = skills;
+    if (phone !== undefined) updateData.phone = phone;
+    if (address !== undefined) updateData.address = address;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-passwordHash");
+
+    if (!user) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("Error actualizando perfil:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+// Obtener perfil de un usuario específico (solo para empresarios)
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "employer") {
+      return res.status(403).json({ error: "Solo los empresarios pueden ver perfiles de usuarios" });
+    }
+
+    const user = await User.findById(req.params.id).select("-passwordHash");
+    if (!user) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("Error obteniendo perfil de usuario:", err);
     res.status(500).json({ error: "Error en el servidor" });
   }
 });

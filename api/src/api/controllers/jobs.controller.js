@@ -119,7 +119,9 @@ router.get("/:id/applicants", authMiddleware, async (req, res) => {
     }
 
     const job = await Job.findById(req.params.id)
-      .populate("applicants", "name email age socialSecurityNumber");
+      .populate("applicants", "name email age socialSecurityNumber")
+      .populate("acceptedApplicants", "name email age socialSecurityNumber")
+      .populate("rejectedApplicants", "name email age socialSecurityNumber");
 
     if (!job) {
       return res.status(404).json({ error: "Trabajo no encontrado" });
@@ -129,9 +131,97 @@ router.get("/:id/applicants", authMiddleware, async (req, res) => {
       return res.status(403).json({ error: "No tienes permiso para ver los candidatos de este trabajo" });
     }
 
-    res.json({ applicants: job.applicants });
+    res.json({ 
+      applicants: job.applicants,
+      acceptedApplicants: job.acceptedApplicants || [],
+      rejectedApplicants: job.rejectedApplicants || []
+    });
   } catch (err) {
     console.error("Error obteniendo candidatos:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+// Aceptar candidato
+router.post("/:id/applicants/:applicantId/accept", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "employer") {
+      return res.status(403).json({ error: "Solo los empleadores pueden aceptar candidatos" });
+    }
+
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ error: "Trabajo no encontrado" });
+    }
+
+    if (job.employer.toString() !== req.user.id) {
+      return res.status(403).json({ error: "No tienes permiso para gestionar candidatos de este trabajo" });
+    }
+
+    const applicantId = req.params.applicantId;
+
+    // Verificar que el candidato esté en la lista de aplicantes
+    if (!job.applicants.includes(applicantId)) {
+      return res.status(400).json({ error: "Este usuario no se ha postulado a este trabajo" });
+    }
+
+    // Mover de applicants a acceptedApplicants
+    job.applicants = job.applicants.filter(id => id.toString() !== applicantId);
+    if (!job.acceptedApplicants) job.acceptedApplicants = [];
+    if (!job.rejectedApplicants) job.rejectedApplicants = [];
+    
+    // Remover de rejected si estaba ahí
+    job.rejectedApplicants = job.rejectedApplicants.filter(id => id.toString() !== applicantId);
+    job.acceptedApplicants.push(applicantId);
+
+    await job.save();
+
+    res.json({ message: "Candidato aceptado correctamente" });
+  } catch (err) {
+    console.error("Error aceptando candidato:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+// Rechazar candidato
+router.post("/:id/applicants/:applicantId/reject", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "employer") {
+      return res.status(403).json({ error: "Solo los empleadores pueden rechazar candidatos" });
+    }
+
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ error: "Trabajo no encontrado" });
+    }
+
+    if (job.employer.toString() !== req.user.id) {
+      return res.status(403).json({ error: "No tienes permiso para gestionar candidatos de este trabajo" });
+    }
+
+    const applicantId = req.params.applicantId;
+
+    // Verificar que el candidato esté en la lista de aplicantes
+    if (!job.applicants.includes(applicantId)) {
+      return res.status(400).json({ error: "Este usuario no se ha postulado a este trabajo" });
+    }
+
+    // Mover de applicants a rejectedApplicants
+    job.applicants = job.applicants.filter(id => id.toString() !== applicantId);
+    if (!job.acceptedApplicants) job.acceptedApplicants = [];
+    if (!job.rejectedApplicants) job.rejectedApplicants = [];
+    
+    // Remover de accepted si estaba ahí
+    job.acceptedApplicants = job.acceptedApplicants.filter(id => id.toString() !== applicantId);
+    job.rejectedApplicants.push(applicantId);
+
+    await job.save();
+
+    res.json({ message: "Candidato rechazado correctamente" });
+  } catch (err) {
+    console.error("Error rechazando candidato:", err);
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
