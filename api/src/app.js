@@ -10,7 +10,9 @@ import apiRoutes from "./api/index.js";
 const app = express();
 
 app.use(cors({
-  origin: true,
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://opportunity-job.vercel.app', 'https://opportunity-job-production.up.railway.app']
+    : true,
   credentials: true,
 }));
 app.use(morgan("dev"));
@@ -26,8 +28,8 @@ app.use(
     store: MongoStore.create({ mongoUrl: config.mongoUri }),
     cookie: {
       httpOnly: true,
-      sameSite: "lax", // usar "none" y secure:true si el front está en otro dominio HTTPS
-      secure: false,
+      sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax",
+      secure: process.env.NODE_ENV === 'production',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     },
   })
