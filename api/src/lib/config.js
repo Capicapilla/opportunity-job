@@ -4,7 +4,7 @@ dotenv.config();
 
 export const config = {
   port: process.env.PORT || 3000,
-  mongoUri: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/opportunity-job",
+  mongoUri: process.env.MONGO_URI || process.env.MONGO_URL || "mongodb://127.0.0.1:27017/opportunity-job",
   jwtSecret: process.env.JWT_SECRET || "capicapilla123",
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   jwtCookieExpiresIn: process.env.JWT_COOKIE_EXPIRES_IN || 7,
