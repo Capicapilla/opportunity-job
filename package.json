@@ -1,0 +1,22 @@
+{
+  "name": "opportunity-job-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "api/src/app.js",
+  "scripts": {
+    "start": "cd api && npm start",
+    "dev": "cd api && npm run dev"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.0",
+    "morgan": "^1.10.1",
+    "nodemailer": "^7.0.6"
+  }
+}
