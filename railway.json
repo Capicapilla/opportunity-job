@@ -1,10 +1,9 @@
 {
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "cd api && npm install"
+    "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "./start-railway.sh",
+    "startCommand": "cd api && npm start",
     "healthcheckPath": "/api",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
