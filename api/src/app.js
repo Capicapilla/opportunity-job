@@ -17,6 +17,7 @@ app.use(cors({
     'https://opportunity-job-production.up.railway.app',
     /^https:\/\/opportunity-.*\.vercel\.app$/,
     /^https:\/\/opportunity-.*-javier-capilla\.vercel\.app$/,
+    /^https:\/\/opportunity-job-git-.*-javier-capilla\.vercel\.app$/, // Dominios de ramas de Git
     /^https:\/\/.*\.vercel\.app$/ // Permitir todos los dominios de Vercel temporalmente
   ] : [
     'http://localhost:5173',
