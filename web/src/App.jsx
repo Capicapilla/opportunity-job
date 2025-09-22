@@ -30,7 +30,7 @@ function AuthProvider({ children }) {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const userData = await apiFetch('/users/me')
+        const userData = await apiFetch('/api/users/me')
         setUser(userData)
       } catch (err) {
         setUser(null)
@@ -42,7 +42,7 @@ function AuthProvider({ children }) {
   }, [])
 
   const login = async (email, password) => {
-    const response = await apiFetch('/sessions', {
+    const response = await apiFetch('/api/sessions', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     })
@@ -52,7 +52,7 @@ function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await apiFetch('/sessions/logout', { method: 'POST' })
+      await apiFetch('/api/sessions/logout', { method: 'POST' })
     } catch (err) {
       console.error('Logout error:', err)
     } finally {
@@ -225,7 +225,7 @@ function LoginPage() {
     
     setLoading(true)
     try {
-      await apiFetch('/users', {
+      await apiFetch('/api/users', {
         method: 'POST',
         body: JSON.stringify(registerForm)
       })
@@ -557,7 +557,7 @@ function JobsPage() {
     let mounted = true
     async function load() {
       try {
-        const data = await apiFetch('/jobs')
+        const data = await apiFetch('/api/jobs')
         if (mounted) setJobs(data)
       } catch (err) {
         if (mounted) setError(err.message)
@@ -572,10 +572,10 @@ function JobsPage() {
   const handleApply = async (jobId) => {
     try {
       setApplyingId(jobId)
-      await apiFetch(`/jobs/${jobId}/apply`, { method: 'POST' })
+      await apiFetch(`/api/jobs/${jobId}/apply`, { method: 'POST' })
       showToast('¡Postulación enviada!', 'success')
       // Actaulizar lista de trabajos tras inscribirse
-      const data = await apiFetch('/jobs')
+      const data = await apiFetch('/api/jobs')
       setJobs(data)
     } catch (err) {
       showToast(err.message, 'error')
@@ -767,8 +767,8 @@ function MePage() {
       
       try {
         const [historyData, profileData] = await Promise.all([
-          apiFetch('/users/me/history'),
-          apiFetch('/users/me')
+          apiFetch('/api/users/me/history'),
+          apiFetch('/api/users/me')
         ])
         setHistory(historyData.history || [])
         
@@ -815,7 +815,7 @@ function MePage() {
         skills: skillsArray
       }
 
-      await apiFetch('/users/me', {
+      await apiFetch('/api/users/me', {
         method: 'PUT',
         body: JSON.stringify(updateData)
       })
@@ -1102,7 +1102,7 @@ function MyApplicationsPage() {
     let mounted = true
     async function load() {
       try {
-        const data = await apiFetch('/users/me/applications')
+        const data = await apiFetch('/api/users/me/applications')
         if (mounted) setApps(data.applications || [])
       } catch (err) {
         showToast(err.message, 'error')
@@ -1525,7 +1525,7 @@ function CreateJobPage() {
         throw new Error('El máximo de postulantes debe estar entre 1 y 10')
       }
 
-      await apiFetch('/jobs', {
+      await apiFetch('/api/jobs', {
         method: 'POST',
         body: JSON.stringify({
           ...form,

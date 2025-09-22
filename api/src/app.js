@@ -25,6 +25,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 // Sesiones de servidor almacenadas en Mongo
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(
   session({
     name: "sid",
@@ -34,8 +35,8 @@ app.use(
     store: MongoStore.create({ mongoUrl: config.mongoUri }),
     cookie: {
       httpOnly: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
       maxAge: 1000 * 60 * 60 * 24 * 7,
     },
   })
