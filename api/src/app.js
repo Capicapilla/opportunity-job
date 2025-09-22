@@ -9,12 +9,16 @@ import apiRoutes from "./api/index.js";
 
 const app = express();
 
+// Configuración de CORS más permisiva para debugging
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(cors({
-  origin: [
+  origin: isProduction ? [
     'https://opportunity-job.vercel.app',
     'https://opportunity-job-production.up.railway.app',
     /^https:\/\/opportunity-.*\.vercel\.app$/,
     /^https:\/\/opportunity-.*-javier-capilla\.vercel\.app$/,
+    /^https:\/\/.*\.vercel\.app$/ // Permitir todos los dominios de Vercel temporalmente
+  ] : [
     'http://localhost:5173',
     'http://localhost:3000'
   ],
@@ -28,7 +32,6 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 // Sesiones de servidor almacenadas en Mongo
-const isProduction = process.env.NODE_ENV === 'production';
 app.use(
   session({
     name: "sid",
