@@ -14,6 +14,7 @@ app.use(cors({
     'https://opportunity-job.vercel.app',
     'https://opportunity-job-production.up.railway.app',
     /^https:\/\/opportunity-.*\.vercel\.app$/,
+    /^https:\/\/opportunity-.*-javier-capilla\.vercel\.app$/,
     'http://localhost:5173',
     'http://localhost:3000'
   ],
