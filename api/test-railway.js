@@ -19,9 +19,9 @@ console.log('URI:', mongoUri);
 
 try {
   await mongoose.connect(mongoUri);
-  console.log('✅ MongoDB conectado exitosamente');
+  console.log('MongoDB conectado exitosamente');
   process.exit(0);
 } catch (error) {
-  console.error('❌ Error conectando a MongoDB:', error.message);
+  console.error('Error conectando a MongoDB:', error.message);
   process.exit(1);
 }
