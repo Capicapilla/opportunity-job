@@ -1,8 +1,8 @@
-# 🚀 Opportunity Job - Plataforma de Empleo
+# Opportunity Job - Plataforma de Empleo
 
 Una plataforma completa de empleo que conecta trabajadores con empresas, desarrollada con React y Node.js.
 
-## ✨ Características
+## Características
 
 ### 👥 Para Trabajadores
 - **Registro y perfil profesional** con experiencia, educación y habilidades
@@ -11,14 +11,14 @@ Una plataforma completa de empleo que conecta trabajadores con empresas, desarro
 - **Seguimiento de aplicaciones** (pendientes, aceptadas, rechazadas)
 - **Historial de trabajo** completo
 
-### 🏢 Para Empresas
+### Para Empresas
 - **Registro empresarial** con información de la compañía
 - **Publicación de ofertas** de trabajo
 - **Gestión de candidatos** (ver, aceptar, rechazar)
 - **Visualización de perfiles** detallados de los aplicantes
 - **Dashboard de aplicaciones** organizadas por estado
 
-## 🛠️ Tecnologías
+## Tecnologías
 
 ### Frontend
 - **React 18** con Vite
@@ -38,7 +38,7 @@ Una plataforma completa de empleo que conecta trabajadores con empresas, desarro
 - **MongoDB Atlas** (producción)
 - **MongoDB local** (desarrollo)
 
-## 🚀 Despliegue
+## Despliegue
 
 ### Frontend (Vercel)
 1. Conecta tu repositorio a Vercel
@@ -54,7 +54,7 @@ Una plataforma completa de empleo que conecta trabajadores con empresas, desarro
    - `SESSION_SECRET` = Una clave secreta
    - `NODE_ENV` = production
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 opportunity-job/
@@ -78,7 +78,7 @@ opportunity-job/
 └── README.md
 ```
 
-## 🔧 Instalación Local
+## Instalación Local
 
 ### Prerrequisitos
 - Node.js 18+
@@ -116,41 +116,41 @@ opportunity-job/
    cd web && npm run dev
    ```
 
-## 📱 Funcionalidades Principales
+## Funcionalidades Principales
 
-### 🔐 Autenticación
+### Autenticación
 - Registro diferenciado (Trabajador/Empresa)
 - Login con sesiones persistentes
 - Logout seguro
 
-### 💼 Gestión de Empleos
+### Gestión de Empleos
 - CRUD completo de ofertas de trabajo
 - Filtros por ubicación, tipo de contrato, salario
 - Aplicación con un clic
 
-### 👤 Perfiles de Usuario
+### Perfiles de Usuario
 - **Trabajadores:** Experiencia, educación, habilidades, contacto
 - **Empresas:** Información de la compañía, descripción
 
-### 📊 Dashboard de Aplicaciones
+### Dashboard de Aplicaciones
 - **Trabajadores:** Ver estado de sus aplicaciones
 - **Empresas:** Gestionar candidatos (aceptar/rechazar)
 
-## 🎨 Diseño
+## Diseño
 
 - **Responsive Design** con Bootstrap 5
 - **UI/UX moderna** y intuitiva
 - **Navegación fluida** entre secciones
 - **Feedback visual** con toasts y estados de carga
 
-## 🔒 Seguridad
+## Seguridad
 
 - **Autenticación basada en sesiones**
 - **CORS configurado** para producción
 - **Validación de datos** en frontend y backend
 - **Sanitización de inputs**
 
-## 🚀 Próximas Mejoras
+## Próximas Mejoras
 
 - [ ] Sistema de notificaciones por email
 - [ ] Chat entre empresas y candidatos
@@ -159,14 +159,10 @@ opportunity-job/
 - [ ] Dashboard de estadísticas
 - [ ] Aplicación móvil
 
-## 👨‍💻 Desarrollado por
+## Desarrollado por
 
-**Tu Nombre** - [GitHub](https://github.com/tu-usuario)
+**Javier Capilla * - [GitHub](https://github.com/tu-usuario)
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
-
----
-
-**¡Conectando talento con oportunidades! 🎯**
